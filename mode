@@ -1,0 +1,160 @@
+--==================================================
+-- DOORS HARD MODE (FINAL MERGED)
+--==================================================
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+--================ UI ACTIVATE =====================
+task.spawn(function()
+	local gui = Instance.new("ScreenGui")
+	gui.IgnoreGuiInset = true
+	gui.ResetOnSpawn = false
+	gui.Parent = player:WaitForChild("PlayerGui")
+
+	local txt = Instance.new("TextLabel")
+	txt.Size = UDim2.new(1,0,0,40)
+	txt.Position = UDim2.new(0,0,1,-80)
+	txt.BackgroundTransparency = 1
+	txt.Text = "Doors Hard Mode Activate...!"
+	txt.Font = Enum.Font.GothamBold
+	txt.TextSize = 24
+	txt.TextStrokeTransparency = 0.5
+	txt.TextColor3 = Color3.new(1,1,1)
+	txt.TextTransparency = 1
+	txt.TextXAlignment = Enum.TextXAlignment.Center
+	txt.Parent = gui
+
+	TweenService:Create(txt, TweenInfo.new(1), {TextTransparency = 0}):Play()
+	task.wait(3)
+	TweenService:Create(txt, TweenInfo.new(1), {TextTransparency = 1}):Play()
+	task.wait(1)
+	gui:Destroy()
+end)
+
+--================ LOAD SPRINT =====================
+task.spawn(function()
+	pcall(function()
+		loadstring(game:HttpGet(
+			"https://raw.githubusercontent.com/Junbbinopro/Sprint-stamina-v3/refs/heads/main/Sprint"
+		))()
+	end)
+end)
+
+--================ ENTITY CONFIG ===================
+local Entities = {
+	{t = 80,  url = "https://raw.githubusercontent.com/Junbbinopro/Depth-v2/refs/heads/main/Entity"}, -- Depth
+	{t = 100, url = "https://raw.githubusercontent.com/Junbbinopro/Trauma-remake/refs/heads/main/Entity"},
+	{t = 200, url = "https://raw.githubusercontent.com/Junbbinopro/200-remake/refs/heads/main/Entity"}, -- ✅ Entity 3 đã đổi
+	{t = 300, url = "https://raw.githubusercontent.com/Junbbinopro/Horror-face/refs/heads/main/Entity"},
+	{t = 500, url = "https://raw.githubusercontent.com/trungdepth-dot/Scary-face-remake/refs/heads/main/Entity"},
+}
+
+for _, e in ipairs(Entities) do
+	e.start = os.clock()
+	e.ready = false
+end
+
+--================ COUNTDOWN (ENTITY KHÁC) =========
+task.spawn(function()
+	while true do
+		task.wait(1)
+		for i, e in ipairs(Entities) do
+			if i ~= 1 then -- không áp dụng cho Depth
+				if not e.ready and os.clock() - e.start >= e.t then
+					e.ready = true
+				end
+			end
+		end
+	end
+end)
+
+--================ DOOR DETECT =====================
+local Rooms = workspace:FindFirstChild("CurrentRooms") or workspace:FindFirstChild("Rooms")
+if not Rooms then return end
+
+local RoomCount = 0
+
+-- ===== DEPTH SPAWN (GIỮ NGUYÊN CƠ CHẾ CŨ) =====
+local DepthCooldownDoors = 0
+local DepthMinCooldown = 3
+local DepthSpawnChance = 25
+
+Rooms.ChildAdded:Connect(function()
+	RoomCount += 1
+	task.wait(0.3)
+
+	for i, e in ipairs(Entities) do
+
+		--========== DEPTH ==========
+		if i == 1 then
+			if RoomCount >= 4 then
+				if DepthCooldownDoors > 0 then
+					DepthCooldownDoors -= 1
+				end
+
+				if DepthCooldownDoors <= 0 then
+					if math.random(1,100) <= DepthSpawnChance then
+						DepthCooldownDoors = DepthMinCooldown
+						task.spawn(function()
+							warn("Depth spawn at room:", RoomCount)
+							pcall(function()
+								loadstring(game:HttpGet(e.url))()
+							end)
+						end)
+					end
+				end
+			end
+
+		--========== ENTITY KHÁC ==========
+		else
+			if e.ready then
+				e.ready = false
+				e.start = os.clock()
+				task.spawn(function()
+					pcall(function()
+						loadstring(game:HttpGet(e.url))()
+					end)
+				end)
+			end
+		end
+	end
+end)
+
+--==================================================
+-- FIX BUG DAMAGE / KILL (DÙNG HITBOX GỐC ENTITY)
+--==================================================
+
+local function getCharacter()
+	return player.Character or player.CharacterAdded:Wait()
+end
+
+local function forceKill()
+	local hum = getCharacter():FindFirstChildOfClass("Humanoid")
+	if hum and hum.Health > 0 then
+		hum.Health = 0
+	end
+end
+
+-- gắn Touched vào hitbox gốc của entity
+local function hookEntityHitbox(model)
+	for _, part in ipairs(model:GetDescendants()) do
+		if part:IsA("BasePart") and part.CanTouch then
+			part.Touched:Connect(function(hit)
+				local char = hit:FindFirstAncestorOfClass("Model")
+				if char == getCharacter() then
+					forceKill()
+				end
+			end)
+		end
+	end
+end
+
+-- theo dõi entity spawn
+workspace.ChildAdded:Connect(function(obj)
+	if obj:IsA("Model") then
+		task.wait(0.1)
+		hookEntityHitbox(obj)
+	end
+end)
