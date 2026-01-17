@@ -44,11 +44,11 @@ end)
 
 --================ ENTITY CONFIG ===================
 local Entities = {
-	{t = 80,  url = "https://raw.githubusercontent.com/Junbbinopro/Depth-v2/refs/heads/main/Entity"}, -- Depth
-	{t = 100, url = "https://raw.githubusercontent.com/Junbbinopro/Trauma-remake/refs/heads/main/Entity"},
-	{t = 200, url = "https://raw.githubusercontent.com/Junbbinopro/200-remake/refs/heads/main/Entity"}, -- ✅ Entity 3 đã đổi
-	{t = 300, url = "https://raw.githubusercontent.com/Junbbinopro/Horror-face/refs/heads/main/Entity"},
-	{t = 500, url = "https://raw.githubusercontent.com/trungdepth-dot/Scary-face-remake/refs/heads/main/Entity"},
+	{t = 80,  url = "https://raw.githubusercontent.com/Junxd-03/Depth-remake/refs/heads/main/Entity"}, -- Depth
+	{t = 100, url = "https://raw.githubusercontent.com/Junxd-03/Trauma-remake/refs/heads/main/Entity"},
+	{t = 200, url = "https://raw.githubusercontent.com/Junxd-03/200-remake/refs/heads/main/Entity"}, -- ✅ Entity 3 đã đổi
+	{t = 300, url = "https://raw.githubusercontent.com/Junxd-03/Horror-face-remake/refs/heads/main/Entity"},
+	{t = 500, url = "https://raw.githubusercontent.com/Junxd-03/Scary-face-remake/refs/heads/main/Entity"},
 }
 
 for _, e in ipairs(Entities) do
